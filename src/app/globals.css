@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-pixel: var(--font-press-start);
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  
+  body {
+    @apply bg-indigo-950 text-white min-h-screen flex flex-col;
+  }
+}
+
+@layer components {
+  .font-pixel {
+    font-family: var(--font-pixel);
+  }
+
+  .border-pixel-edges {
+    @apply border-opacity-20;
+    background-image: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.1) 1px,
+      transparent 1px
+    );
+    background-size: 4px 4px;
+  }
+}
+// Updated on Tue May  6 23:04:02 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:04 EDT 2025
+// Updated on Tue May  6 23:04:05 EDT 2025
+// Updated on Tue May  6 23:04:05 EDT 2025
+// Updated on Tue May  6 23:04:05 EDT 2025
+// Updated on Tue May  6 23:04:05 EDT 2025
+// Updated on Tue May  6 23:04:06 EDT 2025
+// Updated on Tue May  6 23:04:06 EDT 2025
+// Updated on Tue May  6 23:04:06 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:07 EDT 2025
+// Updated on Tue May  6 23:04:08 EDT 2025
+// Updated on Tue May  6 23:04:08 EDT 2025
+// Updated on Tue May  6 23:04:09 EDT 2025
+// Updated on Tue May  6 23:04:09 EDT 2025
+// Updated on Tue May  6 23:04:09 EDT 2025
+// Updated on Tue May  6 23:04:10 EDT 2025
+// Updated on Tue May  6 23:04:10 EDT 2025
+// Updated on Tue May  6 23:04:11 EDT 2025
+// Updated on Tue May  6 23:04:11 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:12 EDT 2025
+// Updated on Tue May  6 23:04:13 EDT 2025
+// Updated on Tue May  6 23:04:13 EDT 2025
+// Updated on Tue May  6 23:04:13 EDT 2025
+// Updated on Tue May  6 23:04:13 EDT 2025
+// Updated on Tue May  6 23:04:13 EDT 2025
