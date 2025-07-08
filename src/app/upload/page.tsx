@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface UploadResponse {
@@ -14,8 +14,29 @@ interface UploadResponse {
     title: string;
     fileUrl: string;
     thumbnailUrl: string;
+    warnings?: string[];
   };
   error?: string;
+  type?: string;
+}
+
+interface ApiLimits {
+  maxFileSize: string;
+  minFileSize: string;
+  allowedTypes: string[];
+  allowedExtensions: string[];
+}
+
+interface RateLimits {
+  perIP: string;
+  uploads: string;
+  global: string;
+}
+
+interface ApiInfo {
+  message: string;
+  limits: ApiLimits;
+  rateLimits: RateLimits;
 }
 
 const SUBJECTS = [
@@ -34,20 +55,60 @@ export default function UploadPage() {
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
+  const [apiInfo, setApiInfo] = useState<ApiInfo | null>(null);
+
+  // Load API information on component mount
+  useEffect(() => {
+    const fetchApiInfo = async () => {
+      try {
+        const response = await fetch('/api/upload');
+        const info: ApiInfo = await response.json();
+        setApiInfo(info);
+      } catch (error) {
+        console.error('Failed to fetch API info:', error);
+      }
+    };
+    fetchApiInfo();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      // Enhanced validation with better error messages
       if (selectedFile.type !== 'application/pdf') {
-        alert('Please select a PDF file');
+        alert('Please select a PDF file. Other file types are not supported.');
         return;
       }
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB');
+      
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      const minSize = 1024; // 1KB
+      
+      if (selectedFile.size > maxSize) {
+        alert(`File size (${formatFileSize(selectedFile.size)}) exceeds the maximum limit of ${formatFileSize(maxSize)}.`);
         return;
       }
+      
+      if (selectedFile.size < minSize) {
+        alert(`File size (${formatFileSize(selectedFile.size)}) is too small. Minimum size is ${formatFileSize(minSize)}.`);
+        return;
+      }
+      
+      // Check file name length
+      if (selectedFile.name.length > 255) {
+        alert('File name is too long. Please rename the file to be 255 characters or less.');
+        return;
+      }
+      
       setFile(selectedFile);
+      setUploadResult(null); // Clear previous results
     }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,6 +175,17 @@ export default function UploadPage() {
           <h1 className="font-pixel text-2xl text-yellow-400 mb-6">
             Upload Cheat Sheet
           </h1>
+
+          {apiInfo && (
+            <div className="bg-indigo-800 border border-yellow-400 rounded p-4 mb-6">
+              <h3 className="text-yellow-400 font-semibold mb-2">Upload Limits</h3>
+              <div className="text-indigo-200 text-sm space-y-1">
+                <p>• {apiInfo.rateLimits.uploads}</p>
+                <p>• {apiInfo.rateLimits.perIP}</p>
+                <p>• Global: {apiInfo.rateLimits.global}</p>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -195,9 +267,12 @@ export default function UploadPage() {
                 className="w-full px-4 py-2 bg-indigo-800 border border-yellow-400 rounded text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-yellow-400 file:text-indigo-900 hover:file:bg-yellow-300"
                 required
               />
-              <p className="text-indigo-300 text-sm mt-1">
-                Maximum file size: 10MB. Only PDF files are allowed.
-              </p>
+              <div className="text-indigo-300 text-sm mt-1 space-y-1">
+                <p>• Maximum file size: {apiInfo?.limits.maxFileSize || '10MB'}</p>
+                <p>• Minimum file size: {apiInfo?.limits.minFileSize || '1KB'}</p>
+                <p>• Only PDF files are allowed</p>
+                <p>• File name must be 255 characters or less</p>
+              </div>
             </div>
 
             <button
@@ -220,7 +295,12 @@ export default function UploadPage() {
               </h3>
               <p>{uploadResult.message}</p>
               {uploadResult.error && (
-                <p className="text-sm mt-1">Details: {uploadResult.error}</p>
+                <p className="text-sm mt-1">
+                  {uploadResult.type === 'rate_limit' && '⏰ '}
+                  {uploadResult.type === 'validation' && '⚠️ '}
+                  {uploadResult.type === 'server_error' && '🔧 '}
+                  {uploadResult.error}
+                </p>
               )}
               {uploadResult.success && uploadResult.data && (
                 <div className="mt-4 space-y-2">
@@ -228,6 +308,16 @@ export default function UploadPage() {
                   <p><strong>Subject:</strong> {uploadResult.data.subject}</p>
                   <p><strong>Course:</strong> {uploadResult.data.subject} {uploadResult.data.courseNumber}</p>
                   <p><strong>Title:</strong> {uploadResult.data.title}</p>
+                  {uploadResult.data.warnings && uploadResult.data.warnings.length > 0 && (
+                    <div className="mt-3 p-2 bg-yellow-900 border border-yellow-400 rounded">
+                      <p className="text-yellow-200 font-semibold">⚠️ Warnings:</p>
+                      <ul className="text-yellow-200 text-sm mt-1">
+                        {uploadResult.data.warnings.map((warning, index) => (
+                          <li key={index}>• {warning}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <div className="flex gap-4 mt-4">
                     <a
                       href={uploadResult.data.fileUrl}
