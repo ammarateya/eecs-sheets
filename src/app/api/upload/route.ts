@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const subject = formData.get('subject') as string;
     const courseNumber = formData.get('courseNumber') as string;
     const title = formData.get('title') as string;
     const description = formData.get('description') as string;
@@ -30,9 +31,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate required fields
-    if (!courseNumber || !title) {
+    if (!subject || !courseNumber || !title) {
       return NextResponse.json({ 
-        error: 'Course number and title are required' 
+        error: 'Subject, course number, and title are required' 
       }, { status: 400 });
     }
 
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     // Generate unique filename
     const timestamp = Date.now();
-    const fileName = `${courseNumber}/${timestamp}-${file.name}`;
+    const fileName = `${subject}/${courseNumber}/${timestamp}-${file.name}`;
     const thumbnailFileName = ThumbnailService.getThumbnailFileName(fileName);
 
     // Upload main PDF file
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
     const metadata = {
       id: fileId,
       fileName: file.name,
+      subject,
       courseNumber,
       title,
       description,

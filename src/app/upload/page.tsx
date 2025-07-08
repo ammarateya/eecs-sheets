@@ -9,6 +9,7 @@ interface UploadResponse {
   data?: {
     id: string;
     fileName: string;
+    subject: string;
     courseNumber: string;
     title: string;
     fileUrl: string;
@@ -17,8 +18,17 @@ interface UploadResponse {
   error?: string;
 }
 
+const SUBJECTS = [
+  { code: "EECS", name: "Electrical Engineering & Computer Science" },
+  { code: "MATH", name: "Mathematics" },
+  { code: "PHYSICS", name: "Physics" },
+  { code: "CHEM", name: "Chemistry" },
+  { code: "OTHER", name: "Other" },
+];
+
 export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
+  const [subject, setSubject] = useState('');
   const [courseNumber, setCourseNumber] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -43,7 +53,7 @@ export default function UploadPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!file || !courseNumber || !title) {
+    if (!file || !subject || !courseNumber || !title) {
       alert('Please fill in all required fields');
       return;
     }
@@ -54,6 +64,7 @@ export default function UploadPage() {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('subject', subject);
       formData.append('courseNumber', courseNumber);
       formData.append('title', title);
       formData.append('description', description);
@@ -69,6 +80,7 @@ export default function UploadPage() {
       if (result.success) {
         // Reset form
         setFile(null);
+        setSubject('');
         setCourseNumber('');
         setTitle('');
         setDescription('');
@@ -105,6 +117,26 @@ export default function UploadPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
+              <label htmlFor="subject" className="block text-white mb-2">
+                Subject *
+              </label>
+              <select
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className="w-full px-4 py-2 bg-indigo-800 border border-yellow-400 rounded text-white focus:outline-none focus:border-yellow-300"
+                required
+              >
+                <option value="">Select a subject</option>
+                {SUBJECTS.map((subj) => (
+                  <option key={subj.code} value={subj.code}>
+                    {subj.code} - {subj.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="courseNumber" className="block text-white mb-2">
                 Course Number *
               </label>
@@ -113,10 +145,13 @@ export default function UploadPage() {
                 id="courseNumber"
                 value={courseNumber}
                 onChange={(e) => setCourseNumber(e.target.value)}
-                placeholder="e.g., EECS 281"
+                placeholder="e.g., 281"
                 className="w-full px-4 py-2 bg-indigo-800 border border-yellow-400 rounded text-white placeholder-indigo-300 focus:outline-none focus:border-yellow-300"
                 required
               />
+              <p className="text-indigo-300 text-sm mt-1">
+                Just the course number (e.g., 281 for EECS 281)
+              </p>
             </div>
 
             <div>
@@ -190,7 +225,8 @@ export default function UploadPage() {
               {uploadResult.success && uploadResult.data && (
                 <div className="mt-4 space-y-2">
                   <p><strong>File:</strong> {uploadResult.data.fileName}</p>
-                  <p><strong>Course:</strong> {uploadResult.data.courseNumber}</p>
+                  <p><strong>Subject:</strong> {uploadResult.data.subject}</p>
+                  <p><strong>Course:</strong> {uploadResult.data.subject} {uploadResult.data.courseNumber}</p>
                   <p><strong>Title:</strong> {uploadResult.data.title}</p>
                   <div className="flex gap-4 mt-4">
                     <a
