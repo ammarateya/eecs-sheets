@@ -13,10 +13,22 @@ export default function Header() {
           href="/"
           className="font-pixel text-xl font-bold tracking-tight hover:text-yellow-400"
         >
-          EECS SHEETS
+          UMICH SHEETS
         </Link>
 
         <nav className="flex items-center gap-4">
+          <Link
+            href="/subjects"
+            className="rounded border border-yellow-400 px-4 py-2 text-yellow-400 hover:bg-yellow-400 hover:text-indigo-900"
+          >
+            Browse
+          </Link>
+          <Link
+            href="/upload"
+            className="rounded border border-yellow-400 px-4 py-2 text-yellow-400 hover:bg-yellow-400 hover:text-indigo-900"
+          >
+            Upload
+          </Link>
           {!isLoggedIn ? (
             <>
               <button
@@ -41,6 +53,7 @@ export default function Header() {
               className="rounded border border-yellow-400 px-4 py-2 text-yellow-400 hover:bg-yellow-400 hover:text-indigo-900"
               onClick={() => {
                 /* TODO: Implement logout */
+                setIsLoggedIn(false);
               }}
             >
               Logout

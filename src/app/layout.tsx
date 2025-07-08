@@ -11,9 +11,9 @@ const pressStart2P = Press_Start_2P({
 });
 
 export const metadata: Metadata = {
-  title: "EECS Sheets | UMich EECS Course Cheat Sheets",
+  title: "UMich Sheets | University of Michigan Course Cheat Sheets",
   description:
-    "A platform for UMich EECS students to share and discover course cheat sheets.",
+    "A platform for UMich students to share and discover course cheat sheets across all subjects.",
 };
 
 export default function RootLayout({
