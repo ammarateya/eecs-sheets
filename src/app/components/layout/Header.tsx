@@ -17,6 +17,12 @@ export default function Header() {
         </Link>
 
         <nav className="flex items-center gap-4">
+          <Link
+            href="/upload"
+            className="rounded border border-yellow-400 px-4 py-2 text-yellow-400 hover:bg-yellow-400 hover:text-indigo-900"
+          >
+            Upload
+          </Link>
           {!isLoggedIn ? (
             <>
               <button
@@ -41,6 +47,7 @@ export default function Header() {
               className="rounded border border-yellow-400 px-4 py-2 text-yellow-400 hover:bg-yellow-400 hover:text-indigo-900"
               onClick={() => {
                 /* TODO: Implement logout */
+                setIsLoggedIn(false);
               }}
             >
               Logout
